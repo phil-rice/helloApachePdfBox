@@ -1,10 +1,11 @@
-package org.hcl.helloApache;
+package org.hcl.pdftemplate;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
@@ -23,8 +24,8 @@ class PdfText implements IPdfPart {
     private final String text;
 
     @Override
-    public void print(IPdfPrinter builder) throws Exception {
-        builder.addText(this);
+    public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
+        printer.printText(stream, this);
     }
 }
 
@@ -39,8 +40,8 @@ class PdfBufferedImage implements IPdfPart {
     private final BufferedImage image;
 
     @Override
-    public void print(IPdfPrinter builder) throws Exception {
-        builder.addBufferedImage(this);
+    public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
+        printer.printBufferedImage(stream, this);
     }
 }
 
@@ -55,7 +56,7 @@ class PdfImage implements IPdfPart {
     private final FunctionWithException<PDDocument, PDImageXObject> image;
 
     @Override
-    public void print(IPdfPrinter builder) throws Exception {
-        builder.addImage(this);
+    public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
+        printer.printImage(stream, this);
     }
 }

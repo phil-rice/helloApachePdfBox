@@ -1,4 +1,4 @@
-package org.hcl.helloApache;
+package org.hcl.pdftemplate;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
