@@ -17,7 +17,7 @@ public class IntegrationTest {
 
     static BufferedImage makeImage() {
         BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-        var g = image.createGraphics();
+        Graphics2D g = image.createGraphics();
         g.setColor(Color.blue);
         g.fillRect(0, 0, 100, 100);
         return image;

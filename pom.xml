@@ -7,7 +7,7 @@
   <groupId>one.xingyi</groupId>
   <artifactId>pdftemplate</artifactId>
   <packaging>jar</packaging>
-  <version>1.1</version>
+  <version>1.1.1</version>
   <url>https://github.com/phil-rice/pdftemplate</url>
   <name>Pdf Template</name>
   <description>Tools for adding text and images to pdfs</description>
@@ -29,8 +29,8 @@
     <connection>git@github.com:phil-rice/pdftemplate.git</connection>
   </scm>
   <properties>
-    <maven.compiler.source>16</maven.compiler.source>
-    <maven.compiler.target>16</maven.compiler.target>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -168,7 +168,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-release-plugin</artifactId>
-            <version>2.5.3</version>
+            <version>3.0.0</version>
             <configuration>
               <localCheckout>true</localCheckout>
               <pushChanges>false</pushChanges>
@@ -186,7 +186,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.7</version>
+            <version>1.6.13</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>ossrh</serverId>
@@ -197,7 +197,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-
+            <version>3.1.0</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -213,7 +213,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.3.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>

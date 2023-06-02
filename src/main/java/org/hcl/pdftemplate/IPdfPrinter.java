@@ -1,13 +1,11 @@
 package org.hcl.pdftemplate;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
@@ -80,7 +78,7 @@ class PdfPrinter implements IPdfPrinter {
     @Override
     public void printBufferedImage(PDPageContentStream stream, PdfBufferedImage image) throws Exception {
         BufferedImage bufferedImage = image.getImage();
-        var jpg = JPEGFactory.createFromImage(doc, bufferedImage);
+        PDImageXObject jpg = JPEGFactory.createFromImage(doc, bufferedImage);
         stream.drawImage(jpg, image.getX(), image.getY());
     }
 
