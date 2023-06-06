@@ -6,6 +6,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.util.Matrix;
 
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
@@ -41,7 +42,8 @@ public interface IPdfPrinter {
 
     static void withStream(PDDocument doc, int pageNo, ConsumerWithException<PDPageContentStream> consumer) throws Exception {
         PDPage page = doc.getDocumentCatalog().getPages().get(pageNo);
-        try (PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, true)) {
+        System.out.println("page: " + page.getRotation());
+        try (PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, false, true)) {
             consumer.accept(contentStream);
         }
     }
@@ -64,7 +66,6 @@ class PdfPrinter implements IPdfPrinter {
 
     @Override
     public void printText(PDPageContentStream stream, PdfText text) throws Exception {
-
         stream.beginText();
         try {
             stream.setFont(text.getFont(), text.getFontSize());
