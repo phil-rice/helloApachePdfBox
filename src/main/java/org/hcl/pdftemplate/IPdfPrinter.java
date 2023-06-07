@@ -1,14 +1,18 @@
 package org.hcl.pdftemplate;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.apache.pdfbox.util.Matrix;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -42,7 +46,6 @@ public interface IPdfPrinter {
 
     static void withStream(PDDocument doc, int pageNo, ConsumerWithException<PDPageContentStream> consumer) throws Exception {
         PDPage page = doc.getDocumentCatalog().getPages().get(pageNo);
-        System.out.println("page: " + page.getRotation());
         try (PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, false, true)) {
             consumer.accept(contentStream);
         }
@@ -53,6 +56,8 @@ public interface IPdfPrinter {
     void printImage(PDPageContentStream stream, PdfImage image) throws Exception;
 
     void printBufferedImage(PDPageContentStream stream, PdfBufferedImage image) throws Exception;
+
+    void printJFreeChart(PDPageContentStream stream, PdfJFreeChart pdfJFreeChart) throws IOException;
 }
 
 @RequiredArgsConstructor
@@ -86,6 +91,31 @@ class PdfPrinter implements IPdfPrinter {
     @Override
     public void printImage(PDPageContentStream stream, PdfImage image) throws Exception {
         stream.drawImage(image.getImage().apply(doc), image.getX(), image.getY());
+    }
+
+    public static BufferedImage removeAlphaChannel(BufferedImage img,
+                                                   int color) {
+        if (!img.getColorModel().hasAlpha()) {
+            return img;
+        }
+
+        int width = img.getWidth();
+        int height = img.getHeight();
+        BufferedImage target = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = target.createGraphics();
+        g.setColor(new Color(color, false));
+        g.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+        return target;
+    }
+
+    @Override
+    public void printJFreeChart(PDPageContentStream stream, PdfJFreeChart pdfJFreeChart) throws IOException {
+        BufferedImage rawImage = pdfJFreeChart.getChart().createBufferedImage(pdfJFreeChart.getWidth() * 3, pdfJFreeChart.getHeight() * 3);
+        BufferedImage image = removeAlphaChannel(rawImage, Color.WHITE.getRGB());
+        PDImageXObject jpg = JPEGFactory.createFromImage(doc, image);
+        stream.drawImage(jpg, pdfJFreeChart.getX(), pdfJFreeChart.getY(), pdfJFreeChart.getWidth(), pdfJFreeChart.getHeight());
     }
 }
 

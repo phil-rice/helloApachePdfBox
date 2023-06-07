@@ -8,6 +8,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.jfree.chart.JFreeChart;
 
 import java.awt.image.BufferedImage;
 
@@ -58,5 +59,23 @@ class PdfImage implements IPdfPart {
     @Override
     public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
         printer.printImage(stream, this);
+    }
+}
+
+@RequiredArgsConstructor
+@EqualsAndHashCode
+@Getter
+@ToString
+class PdfJFreeChart implements IPdfPart {
+    private final float x;
+    private final float y;
+    private final int width; //these are just for resolution issues
+    private final int height;
+    private final int pageNo;
+    private final JFreeChart chart;
+
+    @Override
+    public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
+        printer.printJFreeChart(stream, this);
     }
 }

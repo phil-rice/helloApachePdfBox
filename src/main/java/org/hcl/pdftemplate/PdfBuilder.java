@@ -6,6 +6,7 @@ import lombok.ToString;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.jfree.chart.JFreeChart;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -51,6 +52,14 @@ public class PdfBuilder {
 
     public PdfBuilder addText(float x, float y, String text) {
         return with(new PdfText(x, y, pageNo, font, fontSize, text));
+    }
+
+    public PdfBuilder addJfreeChart(float x, float y, JFreeChart chart) {
+        return this.addJfreeChart(x, y, 300, 200, chart);
+    }
+
+    public PdfBuilder addJfreeChart(float x, float y, int width, int height, JFreeChart chart) {
+        return with(new PdfJFreeChart(x, y, width, height, pageNo, chart));
     }
 
     public PdfBuilder addImage(float x, float y, FunctionWithException<PDDocument, PDImageXObject> image) {
