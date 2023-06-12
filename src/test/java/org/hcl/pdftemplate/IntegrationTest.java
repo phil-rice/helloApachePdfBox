@@ -4,10 +4,12 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.block.BlockBorder;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hcl.pdftemplate.IPdfPrinter.updateTemplate;
@@ -49,17 +52,29 @@ public class IntegrationTest {
         return dataset;
     }
 
-    static public JFreeChart setup(XYDataset dataset) {
-        JFreeChart chart = ChartFactory.createXYLineChart(
+    static TimeSeriesCollection createTimeSeries() {
+        TimeSeries series = new TimeSeries("2016");
+        series.add(new Day(1, 1, 2016), 567);
+        series.add(new Day(2, 1, 2016), 612);
+        series.add(new Day(3, 2, 2016), 800);
+        series.add(new Day(4, 2, 2016), 980);
+        series.add(new Day(5, 4, 2017), 1410);
+        series.add(new Day(6, 5, 2018), 2350);
+        return new TimeSeriesCollection(series);
+    }
+
+    //    static public JFreeChart setupTime(TimeSeries series) {
+//
+//
+//    }
+    static public JFreeChart setupXY(TimeSeriesCollection dataset) {
+        JFreeChart chart = ChartFactory.createTimeSeriesChart(
                 "Average salary per age",
                 "Age",
                 "Salary (€)",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
-                false
+                dataset
         );
+        chart.addSubtitle(new TextTitle("Source: www.jfreechart.com", new Font("Serif", Font.PLAIN, 12)));
 
         XYPlot plot = chart.getXYPlot();
 
@@ -73,15 +88,14 @@ public class IntegrationTest {
         plot.setRangeGridlinesVisible(true);
         plot.setRangeGridlinePaint(Color.BLACK);
 
-        plot.setDomainGridlinesVisible(true);
-        plot.setDomainGridlinePaint(Color.BLACK);
+//        plot.setDomainGridlinesVisible(true);
+//        plot.setDomainGridlinePaint(Color.BLACK);
 
         chart.getLegend().setFrame(BlockBorder.NONE);
 
-        chart.setTitle(new TextTitle("Average Salary per Age",
-                        new Font("Serif", java.awt.Font.BOLD, 18)
-                )
-        );
+        chart.setTitle(new TextTitle("Average Salary per Age", new Font("Serif", java.awt.Font.BOLD, 18)));
+        chart.setSubtitles(Arrays.asList(new TextTitle("Phils subtitle", new Font("Serif", Font.PLAIN,
+                12))));
 
         return chart;
     }
@@ -89,10 +103,12 @@ public class IntegrationTest {
 
     List<IPdfPart> parts = PdfBuilder.builder()
             .addText(400, 200, "Hello World as text")
-            .addText(400, 300, "Second text")
-            .addJfreeChart(100, 0, setup(createDataset()))
+            .fontSize(8)
+            .addText(400, 150, "Second text")
+            .addJfreeChart(100, 0, setupXY(createTimeSeries()))
             .addBufferedImage(100, 200, makeImage())
-            .addImage(100, 400, doc -> PDImageXObject.createFromFileByContent(new File(ClassLoader.getSystemResource("picture.jpg").toURI()), doc))
+            .addImage(100, 400, doc -> PDImageXObject.createFromFileByContent(new File(ClassLoader.getSystemResource(
+                    "picture.jpg").toURI()), doc))
             .build();
 
 
