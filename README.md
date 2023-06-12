@@ -8,6 +8,9 @@ It is intended to be used for the use case where we
 
 It is a simple DSL / Builder around Apache PDFBox.
 
+Usually this template is filled in from a generic <Data>
+
+
 ## Installation
 By maven:
 ```xml
@@ -21,14 +24,44 @@ By maven:
 ## Example usage:
 
 ```java
-    var parts = PdfBuilder.builder()
-            .addText(400, 200, "Hello World as text")
-            .addText(400, 300, "Second text")
-            .addBufferedImage(100, 200, makeImage())
-            .addImage(100, 400, doc -> PDImageXObject.createFromFileByContent(new File(ClassLoader.getSystemResource("picture.jpg").toURI()), doc))
-            .build();
 
-    IPdfPrinter.updateTemplate("test.pdf", parts, doc -> doc.save("HelloWorld.pdf"));
+    List<IPdfPart<List<Map<String, Object>>>> parts = PdfBuilder.<List<Map<String, Object>>>builder()
+            .addImage(100, 450, (doc, data) -> PDImageXObject.createFromFileByContent(
+                    new File(ClassLoader.getSystemResource("picture.jpg").toURI()), doc))
+            .addText(400, 200, data -> "Hello World as text " + data.size())
+            .fontSize(8)
+            .addText(400, 150, data -> "Second text " + data.size())
+            .addJfreeChartAndImage(100, 0,
+                    chartBuilder("Average salary per age", "Salary (€)").
+                            subTitle("some sub title").
+                            addSeries("2016", Color.RED, from("date", "value")).
+                            build(),
+                    200, 100, data -> makeImage())
+            .addJfreeChart(100, 250,
+                    chartBuilder("Second chart", "Salary (€)").
+                            subTitle("some sub title").
+                            addSeries("2016", Color.BLUE, from("date", "value2")).
+                            build())
+            .addBufferedImage(100, 200, data -> makeImage())
+            .build();
+    
+    //And then to use it...
+    //load the template, apply the data, and save it to a new file        
+    var processor = processTemplate("/test.pdf", parts);
+    //then for each data
+    processor.accept(Example.data, doc -> doc.save("output.pdf"));
+            
+   //Or if you want to return the bytes
+    var makeBytes = processTemplateAndReturn("/test.pdf", parts, doc -> {
+        try (var stream = new ByteArrayOutputStream()) {
+            doc.save(stream);
+            return stream.toByteArray();
+        }
+    });
+    //Then for each data
+    byte[] bytes = makeBytes.apply(Example.data); 
+            
+
 ```
 This makes four changes to the template. The template is loaded from the class path
 and then saved to a new file: `HelloWorld.pdf`

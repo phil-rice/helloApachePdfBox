@@ -12,7 +12,6 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -30,13 +29,25 @@ interface IPdfPart<Data> {
 
 
 public interface IPdfPrinter {
-    static <Data> void updateTemplate(String resource, Data data, List<IPdfPart<Data>> parts, ConsumerWithException<PDDocument> consumer) throws Exception {
-        InputStream stream = IPdfPrinter.class.getResourceAsStream(resource);
-        if (stream == null) throw new IllegalArgumentException("Resource not found: " + resource);
-        try (PDDocument doc = PDDocument.load(stream)) {
-            print(doc, data, parts);
-            consumer.accept(doc);
-        }
+    static <Data, To> FunctionWithException<Data, To> processTemplateAndReturn(String resource, List<IPdfPart<Data>> parts, FunctionWithException<PDDocument, To> consumer) {
+        return data -> {
+            InputStream stream = IPdfPrinter.class.getResourceAsStream(resource);
+            if (stream == null) throw new IllegalArgumentException("Resource not found: " + resource);
+            try (PDDocument doc = PDDocument.load(stream)) {
+                print(doc, data, parts);
+                return consumer.apply(doc);
+            }
+        };
+    }
+    static <Data> BiConsumerWithException<Data, ConsumerWithException<PDDocument>> processTemplate(String resource, List<IPdfPart<Data>> parts) {
+        return (data, consumer) -> {
+            InputStream stream = IPdfPrinter.class.getResourceAsStream(resource);
+            if (stream == null) throw new IllegalArgumentException("Resource not found: " + resource);
+            try (PDDocument doc = PDDocument.load(stream)) {
+                print(doc, data, parts);
+                consumer.accept(doc);
+            }
+        };
     }
 
     static <Data> void print(PDDocument doc, Data data, List<IPdfPart<Data>> parts) throws Exception {
@@ -59,7 +70,7 @@ public interface IPdfPrinter {
 
     <Data> void printBufferedImage(PDPageContentStream stream, Data data, PdfBufferedImage<Data> image) throws Exception;
 
-    <Data> void printJFreeChart(PDPageContentStream stream, Data data, PdfJFreeChart<Data> pdfJFreeChart) throws IOException;
+    <Data> void printJFreeChart(PDPageContentStream stream, Data data, PdfJFreeChart<Data> pdfJFreeChart) throws Exception;
 }
 
 @RequiredArgsConstructor
@@ -77,7 +88,7 @@ class PdfPrinter implements IPdfPrinter {
         try {
             stream.setFont(text.getFont(), text.getFontSize());
             stream.newLineAtOffset(text.getX(), text.getY());
-            stream.showText(text.getText());
+            stream.showText(text.getText().apply(data));
         } finally {
             stream.endText();
         }
@@ -85,36 +96,20 @@ class PdfPrinter implements IPdfPrinter {
 
     @Override
     public <Data> void printBufferedImage(PDPageContentStream stream, Data data, PdfBufferedImage<Data> image) throws Exception {
-        BufferedImage bufferedImage = image.getImage();
+        BufferedImage bufferedImage = image.getImage().apply(data);
         PDImageXObject jpg = JPEGFactory.createFromImage(doc, bufferedImage);
         stream.drawImage(jpg, image.getX(), image.getY());
     }
 
     @Override
     public <Data> void printImage(PDPageContentStream stream, Data data, PdfImage<Data> image) throws Exception {
-        stream.drawImage(image.getImage().apply(doc), image.getX(), image.getY());
+        stream.drawImage(image.getImage().apply(doc, data), image.getX(), image.getY());
     }
 
-//    public static BufferedImage removeAlphaChannel(BufferedImage img,
-//                                                   int color) {
-//        if (!img.getColorModel().hasAlpha()) {
-//            return img;
-//        }
-//
-//        int width = img.getWidth();
-//        int height = img.getHeight();
-//        BufferedImage target = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-//        Graphics2D g = target.createGraphics();
-//        g.setColor(new Color(color, false));
-//        g.fillRect(0, 0, img.getWidth(), img.getHeight());
-//        g.drawImage(img, 0, 0, null);
-//        g.dispose();
-//        return target;
-//    }
 
     @Override
-    public <Data> void printJFreeChart(PDPageContentStream stream, Data data, PdfJFreeChart<Data> pdfJFreeChart) throws IOException {
-        BufferedImage rawImage = pdfJFreeChart.getChart().createBufferedImage(pdfJFreeChart.getWidth() * 3, pdfJFreeChart.getHeight() * 3);
+    public <Data> void printJFreeChart(PDPageContentStream stream, Data data, PdfJFreeChart<Data> pdfJFreeChart) throws Exception {
+        BufferedImage rawImage = pdfJFreeChart.getChart().apply(data).createBufferedImage(pdfJFreeChart.getWidth() * 3, pdfJFreeChart.getHeight() * 3);
         BufferedImage image = removeAlphaChannel(rawImage, Color.WHITE.getRGB());
         PDImageXObject jpg = JPEGFactory.createFromImage(doc, image);
         stream.drawImage(jpg, pdfJFreeChart.getX(), pdfJFreeChart.getY(), pdfJFreeChart.getWidth(), pdfJFreeChart.getHeight());

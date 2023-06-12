@@ -1,6 +1,7 @@
 package org.hcl.pdftemplate.freeChart;
 
 import lombok.var;
+import org.hcl.pdftemplate.FunctionWithException;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.block.BlockBorder;
@@ -21,14 +22,15 @@ import java.util.function.Function;
 public interface IMakeJFreeChart {
 
     static IMakeJFreeChart getInstance() {return new MakeJFreeChart();}
-    <Data> Function<Data, JFreeChart> makeTimeChart(DateAndValueGraphDefn<Data, RegularTimePeriod> defn);
+    <Data> FunctionWithException<Data, JFreeChart> makeTimeChart(FunctionWithException<Data, DateAndValueGraphDefn<Data, RegularTimePeriod>> defnFn);
 }
 
 class MakeJFreeChart implements IMakeJFreeChart {
 
     @Override
-    public <Data> Function<Data, JFreeChart> makeTimeChart(DateAndValueGraphDefn<Data, RegularTimePeriod> defn) {
+    public <Data> FunctionWithException<Data, JFreeChart> makeTimeChart(FunctionWithException<Data, DateAndValueGraphDefn<Data, RegularTimePeriod>> defnFn) {
         return data -> {
+            var defn = defnFn.apply(data);
             TimeSeriesCollection dataset = makeTimeDataSet(defn).apply(data);
             JFreeChart chart = ChartFactory.createTimeSeriesChart(
                     defn.title,
@@ -40,7 +42,6 @@ class MakeJFreeChart implements IMakeJFreeChart {
             var renderer = new XYLineAndShapeRenderer();
             for (int i = 0; i < dataset.getSeriesCount(); i++) {
                 SeriesDefn<Data, RegularTimePeriod> seriesDefn = defn.seriesDefns.get(i);
-                System.out.println("seriesDefn " + " = " + seriesDefn);
                 renderer.setSeriesPaint(i, seriesDefn.seriesColor);
                 renderer.setSeriesStroke(i, new BasicStroke(seriesDefn.seriesStrokeWidth));
             }
@@ -71,16 +72,9 @@ class MakeJFreeChart implements IMakeJFreeChart {
             TimeSeriesCollection result = new TimeSeriesCollection();
             defn.seriesDefns.stream().map(seriesDefn -> {
                 var series = new TimeSeries(seriesDefn.seriesName);
-                seriesDefn.dataFn.all(data).forEach(t -> {
-                    System.out.println("t = " + t);
-                    series.add(t.t1, t.t2);
-                });
-                System.out.println("series " + seriesDefn.seriesName + " = " + series.getItemCount());
-                for (int i = 0; i < series.getItemCount(); i++)
-                    System.out.println("series " + seriesDefn.seriesName + i + " = " + series.getDataItem(i) + series.getDataItem(i).getValue());
+                seriesDefn.dataFn.all(data).forEach(t -> series.add(t.t1, t.t2));
                 return series;
             }).forEach(result::addSeries);
-            System.out.println("result = " + result.getSeriesCount());
             return result;
         };
     }

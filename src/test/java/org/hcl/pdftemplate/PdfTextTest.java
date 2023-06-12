@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 
 class PdfTextTest {
 
-    PdfText<String> text = new PdfText<>(1, 2, 3, null, 4, "text");
+    PdfText<String> text = new PdfText<>(1, 2, 3, null, 4, s -> s + "_test");
 
     IPdfPrinter mockPrinter() {
         IPdfPrinter printer = Mockito.mock(IPdfPrinter.class);
@@ -22,12 +22,12 @@ class PdfTextTest {
     }
 
     @Test
-    void testTextConstructor() {
+    void testTextConstructor() throws Exception {
         assertEquals(1, text.getX());
         assertEquals(2, text.getY());
         assertEquals(3, text.getPageNo());
         assertEquals(4, text.getFontSize());
-        assertEquals("text", text.getText());
+        assertEquals("someString_test", text.getText().apply("someString"));
     }
 
     @Test
@@ -40,7 +40,7 @@ class PdfTextTest {
 
     @Test
     void testImage() {
-        FunctionWithException<PDDocument, PDImageXObject> makeImage = mock(FunctionWithException.class);
+        BiFunctionWithException<PDDocument, String, PDImageXObject> makeImage = mock(BiFunctionWithException.class);
         PdfImage<String> image = new PdfImage<>(1, 2, 3, makeImage);
         assertEquals(1, image.getX());
         assertEquals(2, image.getY());
@@ -60,8 +60,8 @@ class PdfTextTest {
 
     @Test
     void testBufferedImage() {
-        BufferedImage image = Mockito.mock(BufferedImage.class);
-        PdfBufferedImage pdfImage = new PdfBufferedImage(1, 2, 3, image);
+        FunctionWithException<String,BufferedImage> image = Mockito.mock(FunctionWithException.class);
+        PdfBufferedImage <String> pdfImage = new PdfBufferedImage<>(1, 2, 3, image);
         assertEquals(1, pdfImage.getX());
         assertEquals(2, pdfImage.getY());
         assertEquals(3, pdfImage.getPageNo());

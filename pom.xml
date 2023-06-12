@@ -7,7 +7,7 @@
   <groupId>one.xingyi</groupId>
   <artifactId>pdftemplate</artifactId>
   <packaging>jar</packaging>
-  <version>1.1.6</version>
+  <version>1.2.0</version>
   <url>https://github.com/phil-rice/pdftemplate</url>
   <name>Pdf Template</name>
   <description>Tools for adding text and images to pdfs</description>

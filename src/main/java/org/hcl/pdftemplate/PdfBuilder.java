@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 @EqualsAndHashCode
 @Getter
@@ -50,23 +51,26 @@ public class PdfBuilder<Data> {
         return this;
     }
 
-    public PdfBuilder<Data> addText(float x, float y, String text) {
+    public PdfBuilder<Data> addText(float x, float y, FunctionWithException<Data, String> text) {
         return with(new PdfText<>(x, y, pageNo, font, fontSize, text));
     }
 
-    public PdfBuilder<Data> addJfreeChart(float x, float y, JFreeChart chart) {
+    public PdfBuilder<Data> addJfreeChart(float x, float y, FunctionWithException<Data, JFreeChart> chart) {
         return this.addJfreeChart(x, y, 300, 200, chart);
     }
+    public PdfBuilder<Data> addJfreeChartAndImage(float x, float y, FunctionWithException<Data, JFreeChart> chart, float xOffset, float yOffset,FunctionWithException<Data,BufferedImage> image) {
+        return this.addJfreeChart(x, y, 300, 200, chart).addBufferedImage(x + xOffset, y + yOffset, image);
+    }
 
-    public PdfBuilder<Data> addJfreeChart(float x, float y, int width, int height, JFreeChart chart) {
+    public PdfBuilder<Data> addJfreeChart(float x, float y, int width, int height, FunctionWithException<Data, JFreeChart> chart) {
         return with(new PdfJFreeChart<>(x, y, width, height, pageNo, chart));
     }
 
-    public PdfBuilder<Data> addImage(float x, float y, FunctionWithException<PDDocument, PDImageXObject> image) {
+    public PdfBuilder<Data> addImage(float x, float y, BiFunctionWithException<PDDocument, Data, PDImageXObject> image) {
         return with(new PdfImage<>(x, y, pageNo, image));
     }
 
-    public PdfBuilder<Data> addBufferedImage(float x, float y, BufferedImage image) {
+    public PdfBuilder<Data> addBufferedImage(float x, float y, FunctionWithException<Data, BufferedImage> image) {
         return with(new PdfBufferedImage<>(x, y, pageNo, image));
     }
 

@@ -3,7 +3,7 @@ package org.hcl.pdftemplate;
 import lombok.var;
 import one.xingyi.optics.IFold;
 import one.xingyi.tuples.Tuple2;
-import org.hcl.pdftemplate.freeChart.Builder;
+import org.hcl.pdftemplate.freeChart.ChartBuilder;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.time.Day;
@@ -47,8 +47,8 @@ public class Example {
         return IFold.of(list -> list.stream().map(map -> Tuple2.of(dateFromString(map.get(dateKey)), (Double) map.get(valueKey))));
     }
 
-    public static void main(String[] args) throws IOException {
-        var dataToFreeChart = Builder.<List<Map<String, Object>>>dateBuilder("Title", "Value").
+    public static void main(String[] args) throws Exception {
+        var dataToFreeChart = ChartBuilder.<List<Map<String, Object>>>forDataChart("Title", "Value").
                 subTitle("SubTitle").
                 addSeries("Series1", Color.RED, from("date", "value")).
                 addSeries("Series2", Color.BLUE, from("date", "value2")).

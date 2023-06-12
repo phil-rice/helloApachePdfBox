@@ -22,7 +22,7 @@ class PdfText<Data> implements IPdfPart<Data> {
     private final int pageNo;
     private final PDType1Font font;
     private final int fontSize;
-    private final String text;
+    private final FunctionWithException<Data,String> text;
 
     @Override
     public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {
@@ -38,7 +38,7 @@ class PdfBufferedImage<Data> implements IPdfPart<Data> {
     private final float x;
     private final float y;
     private final int pageNo;
-    private final BufferedImage image;
+    private final FunctionWithException<Data,BufferedImage> image;
 
     @Override
     public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {
@@ -54,7 +54,7 @@ class PdfImage<Data> implements IPdfPart<Data> {
     private final float x;
     private final float y;
     private final int pageNo;
-    private final FunctionWithException<PDDocument, PDImageXObject> image;
+    private final BiFunctionWithException<PDDocument, Data, PDImageXObject> image;
 
     @Override
     public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {
@@ -72,7 +72,7 @@ class PdfJFreeChart<Data> implements IPdfPart<Data> {
     private final int width; //these are just for resolution issues
     private final int height;
     private final int pageNo;
-    private final JFreeChart chart;
+    private final FunctionWithException<Data,JFreeChart> chart;
 
     @Override
     public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {
