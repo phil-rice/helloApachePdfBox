@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage;
 @EqualsAndHashCode
 @Getter
 @ToString
-class PdfText implements IPdfPart {
+class PdfText<Data> implements IPdfPart<Data> {
     private final float x;
     private final float y;
     private final int pageNo;
@@ -25,8 +25,8 @@ class PdfText implements IPdfPart {
     private final String text;
 
     @Override
-    public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
-        printer.printText(stream, this);
+    public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {
+        printer.printText(stream, data, this);
     }
 }
 
@@ -34,15 +34,15 @@ class PdfText implements IPdfPart {
 @EqualsAndHashCode
 @Getter
 @ToString
-class PdfBufferedImage implements IPdfPart {
+class PdfBufferedImage<Data> implements IPdfPart<Data> {
     private final float x;
     private final float y;
     private final int pageNo;
     private final BufferedImage image;
 
     @Override
-    public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
-        printer.printBufferedImage(stream, this);
+    public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {
+        printer.printBufferedImage(stream, data, this);
     }
 }
 
@@ -50,15 +50,15 @@ class PdfBufferedImage implements IPdfPart {
 @EqualsAndHashCode
 @Getter
 @ToString
-class PdfImage implements IPdfPart {
+class PdfImage<Data> implements IPdfPart<Data> {
     private final float x;
     private final float y;
     private final int pageNo;
     private final FunctionWithException<PDDocument, PDImageXObject> image;
 
     @Override
-    public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
-        printer.printImage(stream, this);
+    public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {
+        printer.printImage(stream, data, this);
     }
 }
 
@@ -66,7 +66,7 @@ class PdfImage implements IPdfPart {
 @EqualsAndHashCode
 @Getter
 @ToString
-class PdfJFreeChart implements IPdfPart {
+class PdfJFreeChart<Data> implements IPdfPart<Data> {
     private final float x;
     private final float y;
     private final int width; //these are just for resolution issues
@@ -75,7 +75,7 @@ class PdfJFreeChart implements IPdfPart {
     private final JFreeChart chart;
 
     @Override
-    public void print(IPdfPrinter printer, PDPageContentStream stream) throws Exception {
-        printer.printJFreeChart(stream, this);
+    public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {
+        printer.printJFreeChart(stream, data, this);
     }
 }

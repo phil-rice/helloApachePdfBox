@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 
 class PdfTextTest {
 
-    PdfText text = new PdfText(1, 2, 3, null, 4, "text");
+    PdfText<String> text = new PdfText<>(1, 2, 3, null, 4, "text");
 
     IPdfPrinter mockPrinter() {
         IPdfPrinter printer = Mockito.mock(IPdfPrinter.class);
@@ -34,14 +34,14 @@ class PdfTextTest {
     void testTextPrint() throws Exception {
         IPdfPrinter printer = Mockito.mock(IPdfPrinter.class);
         PDPageContentStream stream = Mockito.mock(PDPageContentStream.class);
-        text.print(printer, stream);
-        Mockito.verify(printer, times(1)).printText(stream, text);
+        text.print(printer, stream, "someData");
+        Mockito.verify(printer, times(1)).printText(stream, "someData", text);
     }
 
     @Test
     void testImage() {
         FunctionWithException<PDDocument, PDImageXObject> makeImage = mock(FunctionWithException.class);
-        PdfImage image = new PdfImage(1, 2, 3, makeImage);
+        PdfImage<String> image = new PdfImage<>(1, 2, 3, makeImage);
         assertEquals(1, image.getX());
         assertEquals(2, image.getY());
         assertEquals(3, image.getPageNo());
@@ -53,9 +53,9 @@ class PdfTextTest {
     void testImagePrint() throws Exception {
         IPdfPrinter printer = Mockito.mock(IPdfPrinter.class);
         PDPageContentStream stream = Mockito.mock(PDPageContentStream.class);
-        PdfImage image = new PdfImage(1, 2, 3, null);
-        image.print(printer, stream);
-        Mockito.verify(printer, times(1)).printImage(stream, image);
+        PdfImage<String> image = new PdfImage<>(1, 2, 3, null);
+        image.print(printer, stream, "someData");
+        Mockito.verify(printer, times(1)).printImage(stream, "someData", image);
     }
 
     @Test
@@ -72,8 +72,8 @@ class PdfTextTest {
     void testBufferedImagePrint() throws Exception {
         IPdfPrinter printer = Mockito.mock(IPdfPrinter.class);
         PDPageContentStream stream = Mockito.mock(PDPageContentStream.class);
-        PdfBufferedImage image = new PdfBufferedImage(1, 2, 3, null);
-        image.print(printer, stream);
-        Mockito.verify(printer, times(1)).printBufferedImage(stream, image);
+        PdfBufferedImage<String> image = new PdfBufferedImage<>(1, 2, 3, null);
+        image.print(printer, stream, "someData");
+        Mockito.verify(printer, times(1)).printBufferedImage(stream, "someData", image);
     }
 }

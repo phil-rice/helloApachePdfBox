@@ -16,58 +16,58 @@ import java.util.List;
 @EqualsAndHashCode
 @Getter
 @ToString
-public class PdfBuilder {
-    static public PdfBuilder builder() {
-        return new PdfBuilder();
+public class PdfBuilder<Data> {
+    static public <Data> PdfBuilder<Data> builder() {
+        return new PdfBuilder<Data>();
     }
 
-    final List<IPdfPart> parts = new ArrayList<>();
+    final List<IPdfPart<Data>> parts = new ArrayList<>();
     int pageNo = 0;
     PDType1Font font = PDType1Font.TIMES_ROMAN;
     int fontSize = 12;
 
-    public List<IPdfPart> build() {
+    public List<IPdfPart<Data>> build() {
         return Collections.unmodifiableList(parts);
     }
 
-    private PdfBuilder with(IPdfPart part) {
+    private PdfBuilder<Data> with(IPdfPart<Data> part) {
         parts.add(part);
         return this;
     }
 
-    public PdfBuilder pageNo(int pageNo) {
+    public PdfBuilder<Data> pageNo(int pageNo) {
         this.pageNo = pageNo;
         return this;
     }
 
-    public PdfBuilder font(PDType1Font font) {
+    public PdfBuilder<Data> font(PDType1Font font) {
         this.font = font;
         return this;
     }
 
-    public PdfBuilder fontSize(int fontSize) {
+    public PdfBuilder<Data> fontSize(int fontSize) {
         this.fontSize = fontSize;
         return this;
     }
 
-    public PdfBuilder addText(float x, float y, String text) {
-        return with(new PdfText(x, y, pageNo, font, fontSize, text));
+    public PdfBuilder<Data> addText(float x, float y, String text) {
+        return with(new PdfText<>(x, y, pageNo, font, fontSize, text));
     }
 
-    public PdfBuilder addJfreeChart(float x, float y, JFreeChart chart) {
+    public PdfBuilder<Data> addJfreeChart(float x, float y, JFreeChart chart) {
         return this.addJfreeChart(x, y, 300, 200, chart);
     }
 
-    public PdfBuilder addJfreeChart(float x, float y, int width, int height, JFreeChart chart) {
-        return with(new PdfJFreeChart(x, y, width, height, pageNo, chart));
+    public PdfBuilder<Data> addJfreeChart(float x, float y, int width, int height, JFreeChart chart) {
+        return with(new PdfJFreeChart<>(x, y, width, height, pageNo, chart));
     }
 
-    public PdfBuilder addImage(float x, float y, FunctionWithException<PDDocument, PDImageXObject> image) {
-        return with(new PdfImage(x, y, pageNo, image));
+    public PdfBuilder<Data> addImage(float x, float y, FunctionWithException<PDDocument, PDImageXObject> image) {
+        return with(new PdfImage<>(x, y, pageNo, image));
     }
 
-    public PdfBuilder addBufferedImage(float x, float y, BufferedImage image) {
-        return with(new PdfBufferedImage(x, y, pageNo, image));
+    public PdfBuilder<Data> addBufferedImage(float x, float y, BufferedImage image) {
+        return with(new PdfBufferedImage<>(x, y, pageNo, image));
     }
 
 }

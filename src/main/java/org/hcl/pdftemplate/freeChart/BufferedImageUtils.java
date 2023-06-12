@@ -3,7 +3,7 @@ package org.hcl.pdftemplate.freeChart;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
- interface BufferedImageUtils {
+public interface BufferedImageUtils {
     public static BufferedImage removeAlphaChannel(BufferedImage img,
                                                    int color) {
         if (!img.getColorModel().hasAlpha()) {
@@ -21,8 +21,8 @@ import java.awt.image.BufferedImage;
         return target;
     }
 
-     static BufferedImage createImage(int width, int height,
-                                            boolean hasAlpha) {
+    static BufferedImage createImage(int width, int height,
+                                     boolean hasAlpha) {
         return new BufferedImage(width, height,
                 hasAlpha ? BufferedImage.TYPE_INT_ARGB
                         : BufferedImage.TYPE_INT_RGB);

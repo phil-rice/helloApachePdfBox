@@ -101,14 +101,14 @@ public class IntegrationTest {
     }
 
 
-    List<IPdfPart> parts = PdfBuilder.builder()
+    List<IPdfPart<String>> parts = PdfBuilder.<String>builder()
             .addText(400, 200, "Hello World as text")
             .fontSize(8)
             .addText(400, 150, "Second text")
             .addJfreeChart(100, 0, setupXY(createTimeSeries()))
             .addBufferedImage(100, 200, makeImage())
-            .addImage(100, 400, doc -> PDImageXObject.createFromFileByContent(new File(ClassLoader.getSystemResource(
-                    "picture.jpg").toURI()), doc))
+            .addImage(100, 400, doc -> PDImageXObject.createFromFileByContent(
+                    new File(ClassLoader.getSystemResource("picture.jpg").toURI()), doc))
             .build();
 
 
@@ -117,7 +117,7 @@ public class IntegrationTest {
         //OK this isn't a great test. We really want to check we've adding the text and the images...
         //But it's a start: we check the file was created and that no exceptions were thrown.
         outputPdf.delete();
-        updateTemplate("/test.pdf", parts, doc -> doc.save("output.pdf"));
+        updateTemplate("/test.pdf", "someData", parts, doc -> doc.save("output.pdf"));
         assertTrue(outputPdf.exists());
 
     }

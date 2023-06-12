@@ -1,8 +1,9 @@
-package org.hcl.pdftemplate.freeChart;
+package org.hcl.pdftemplate;
 
 import lombok.var;
 import one.xingyi.optics.IFold;
 import one.xingyi.tuples.Tuple2;
+import org.hcl.pdftemplate.freeChart.Builder;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.time.Day;
