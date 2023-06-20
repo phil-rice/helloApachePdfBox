@@ -48,8 +48,8 @@ public class Example {
     }
 
     public static void main(String[] args) throws Exception {
-        var dataToFreeChart = ChartBuilder.<List<Map<String, Object>>>forDataChart("Title", "Value").
-                subTitle("SubTitle").
+        var dataToFreeChart = ChartBuilder.<List<Map<String, Object>>>forDataChart(data -> "Title", data -> "Value").
+                subTitle(data -> "SubTitle").
                 addSeries("Series1", Color.RED, from("date", "value")).
                 addSeries("Series2", Color.BLUE, from("date", "value2")).
                 build();

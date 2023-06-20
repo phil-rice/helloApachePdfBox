@@ -32,10 +32,11 @@ class MakeJFreeChart implements IMakeJFreeChart {
         return data -> {
             var defn = defnFn.apply(data);
             TimeSeriesCollection dataset = makeTimeDataSet(defn).apply(data);
+            String title = defn.title.apply(data);
             JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                    defn.title,
-                    defn.xAxis,
-                    defn.yAxis,
+                    title,
+                    defn.xAxis.apply(data),
+                    defn.yAxis.apply(data),
                     dataset);
             XYPlot plot = chart.getXYPlot();
 
@@ -59,10 +60,12 @@ class MakeJFreeChart implements IMakeJFreeChart {
             }
             chart.getLegend().setFrame(BlockBorder.NONE);
 
-            chart.setTitle(new TextTitle(defn.title, new Font("Serif", Font.BOLD, 18)));
-            if (defn.subTitle != null && defn.subTitle.length() > 0)
-                chart.setSubtitles(Arrays.asList(new TextTitle(defn.subTitle, new Font("Serif", Font.PLAIN,
+//            chart.setTitle(new TextTitle(title, new Font("Serif", Font.BOLD, 18)));
+            String subTitle = defn.subTitle.apply(data);
+            if (subTitle != null && subTitle.length() > 0)
+                chart.setSubtitles(Arrays.asList(new TextTitle(subTitle, new Font("Serif", Font.PLAIN,
                         12))));
+
             return chart;
         };
     }

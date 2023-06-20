@@ -6,13 +6,14 @@ import lombok.ToString;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.hcl.pdftemplate.part.*;
 import org.jfree.chart.JFreeChart;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
+import java.util.ResourceBundle;
 
 @EqualsAndHashCode
 @Getter
@@ -21,6 +22,7 @@ public class PdfBuilder<Data> {
     static public <Data> PdfBuilder<Data> builder() {
         return new PdfBuilder<Data>();
     }
+
 
     final List<IPdfPart<Data>> parts = new ArrayList<>();
     int pageNo = 0;
@@ -55,10 +57,14 @@ public class PdfBuilder<Data> {
         return with(new PdfText<>(x, y, pageNo, font, fontSize, text));
     }
 
+    public PdfBuilder<Data> addParts(FunctionWithException<PdfBuilder<Data>, PdfBuilder<Data>> fn) throws Exception {
+        return fn.apply(this);
+    }
+
     public PdfBuilder<Data> addJfreeChart(float x, float y, FunctionWithException<Data, JFreeChart> chart) {
         return this.addJfreeChart(x, y, 300, 200, chart);
     }
-    public PdfBuilder<Data> addJfreeChartAndImage(float x, float y, FunctionWithException<Data, JFreeChart> chart, float xOffset, float yOffset,FunctionWithException<Data,BufferedImage> image) {
+    public PdfBuilder<Data> addJfreeChartAndImage(float x, float y, FunctionWithException<Data, JFreeChart> chart, float xOffset, float yOffset, FunctionWithException<Data, BufferedImage> image) {
         return this.addJfreeChart(x, y, 300, 200, chart).addBufferedImage(x + xOffset, y + yOffset, image);
     }
 

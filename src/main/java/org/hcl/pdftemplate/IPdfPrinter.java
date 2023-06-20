@@ -9,49 +9,43 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.hcl.pdftemplate.part.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static org.hcl.pdftemplate.freeChart.BufferedImageUtils.removeAlphaChannel;
 
-interface IPdfPart<Data> {
-    void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception;
 
-    float getX();
-
-    float getY();
-
-    int getPageNo();
-}
 
 
 public interface IPdfPrinter {
-    static <Data, To> FunctionWithException<Data, To> processTemplateAndReturn(String resource, List<IPdfPart<Data>> parts, FunctionWithException<PDDocument, To> consumer) {
+    static <Data, To> FunctionWithException<Data, To> processTemplateAndReturn(String resource, ResourceBundle bundle, List<IPdfPart<Data>> parts, FunctionWithException<PDDocument, To> consumer) {
         return data -> {
             InputStream stream = IPdfPrinter.class.getResourceAsStream(resource);
             if (stream == null) throw new IllegalArgumentException("Resource not found: " + resource);
             try (PDDocument doc = PDDocument.load(stream)) {
-                print(doc, data, parts);
+                print(doc,bundle, data, parts);
                 return consumer.apply(doc);
             }
         };
     }
-    static <Data> BiConsumerWithException<Data, ConsumerWithException<PDDocument>> processTemplate(String resource, List<IPdfPart<Data>> parts) {
+    static <Data> BiConsumerWithException<Data, ConsumerWithException<PDDocument>> processTemplate(String resource, ResourceBundle bundle,List<IPdfPart<Data>> parts) {
         return (data, consumer) -> {
             InputStream stream = IPdfPrinter.class.getResourceAsStream(resource);
             if (stream == null) throw new IllegalArgumentException("Resource not found: " + resource);
             try (PDDocument doc = PDDocument.load(stream)) {
-                print(doc, data, parts);
+                print(doc, bundle,data, parts);
                 consumer.accept(doc);
             }
         };
     }
 
-    static <Data> void print(PDDocument doc, Data data, List<IPdfPart<Data>> parts) throws Exception {
-        IPdfPrinter printer = new PdfPrinter(doc);
+    static <Data> void print(PDDocument doc, ResourceBundle bundle, Data data, List<IPdfPart<Data>> parts) throws Exception {
+        IPdfPrinter printer = new PdfPrinter(doc, bundle);
         for (IPdfPart part : parts)
             withStream(doc, part.getPageNo(), stream ->//there is an obvious optimization still to do here: group the items by page and only make one stream per page
                     part.print(printer, stream, data));
@@ -80,6 +74,7 @@ public interface IPdfPrinter {
 class PdfPrinter implements IPdfPrinter {
 
     private final PDDocument doc;
+    private final ResourceBundle bundle;
 
 
     @Override
@@ -88,7 +83,9 @@ class PdfPrinter implements IPdfPrinter {
         try {
             stream.setFont(text.getFont(), text.getFontSize());
             stream.newLineAtOffset(text.getX(), text.getY());
-            stream.showText(text.getText().apply(data));
+            String raw = text.getText().apply(data);
+            String toDisplay = bundle.containsKey(raw) ? bundle.getString(raw) : raw;
+            if (toDisplay != null) stream.showText(toDisplay);
         } finally {
             stream.endText();
         }

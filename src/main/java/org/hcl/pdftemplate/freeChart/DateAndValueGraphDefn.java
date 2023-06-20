@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import one.xingyi.optics.IFold;
 import one.xingyi.tuples.Tuple2;
+import org.hcl.pdftemplate.FunctionWithException;
 
 import java.awt.*;
 import java.util.List;
+import java.util.function.Function;
 
 
 @RequiredArgsConstructor
@@ -16,10 +18,10 @@ import java.util.List;
 @Getter
 @ToString
 public class DateAndValueGraphDefn<Data, XData> {
-    final String title;
-    final String subTitle;
-    final String xAxis;
-    final String yAxis;
+    final FunctionWithException<Data, String> title;
+    final FunctionWithException<Data, String> subTitle;
+    final FunctionWithException<Data, String> xAxis;
+    final FunctionWithException<Data, String> yAxis;
     final boolean showXLines;
     final boolean showYLines;
     final List<SeriesDefn<Data, XData>> seriesDefns;

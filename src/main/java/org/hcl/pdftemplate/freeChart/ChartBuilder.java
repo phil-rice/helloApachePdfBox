@@ -18,10 +18,10 @@ import java.util.function.Function;
 @EqualsAndHashCode
 public class ChartBuilder<Data, XData> {
     Class<XData> xDataClass;
-    String title = "";
-    String subTitle = "";
-    String xAxis = "Date";
-    String yAxis = "Value";
+    FunctionWithException<Data, String> title = data -> "";
+    FunctionWithException<Data, String> subTitle = data -> "";
+    FunctionWithException<Data, String> xAxis = data -> "Date";
+    FunctionWithException<Data, String> yAxis = data -> "Value";
     boolean showXLines = false;
     boolean showYLines = false;
 
@@ -29,15 +29,15 @@ public class ChartBuilder<Data, XData> {
     Float seriesStrokeWidth = 2.0f;
 
     List<SeriesDefn<Data, XData>> seriesDefns = new ArrayList<>();
-    public static <Data> ChartBuilder<Data, RegularTimePeriod> forDataChart(String title, String yAxis) {
+    public static <Data> ChartBuilder<Data, RegularTimePeriod> forDataChart(FunctionWithException<Data, String> title, FunctionWithException<Data, String> yAxis) {
         ChartBuilder<Data, RegularTimePeriod> result = new ChartBuilder<>();
         result.xDataClass = RegularTimePeriod.class;
         result.title = title;
         result.yAxis = yAxis;
         return result;
     }
-    public ChartBuilder<Data, XData> subTitle(String subTitle) {this.subTitle = subTitle; return this;}
-    public ChartBuilder<Data, XData> xAxis(String xAxis) {this.xAxis = xAxis; return this;}
+    public ChartBuilder<Data, XData> subTitle(FunctionWithException<Data, String> subTitle) {this.subTitle = subTitle; return this;}
+    public ChartBuilder<Data, XData> xAxis(FunctionWithException<Data, String> xAxis) {this.xAxis = xAxis; return this;}
     public ChartBuilder<Data, XData> showXLines(boolean showXLines) {this.showXLines = showXLines; return this;}
     public ChartBuilder<Data, XData> showYLines(boolean showYLines) {this.showYLines = showYLines; return this;}
     public ChartBuilder<Data, XData> seriesStrokeWidth(Float seriesStrokeWidth) {this.seriesStrokeWidth = seriesStrokeWidth; return this;}
@@ -50,7 +50,7 @@ public class ChartBuilder<Data, XData> {
     }
 
     public FunctionWithException<Data, DateAndValueGraphDefn<Data, XData>> buildDefn() {
-        return data -> new DateAndValueGraphDefn<>(title, subTitle, xAxis, yAxis, showXLines, showYLines, seriesDefns);
+        return data -> new DateAndValueGraphDefn<Data, XData>(title, subTitle, xAxis, yAxis, showXLines, showYLines, seriesDefns);
     }
     public FunctionWithException<Data, JFreeChart> build(IMakeJFreeChart makeJFreeChart) {
         if (xDataClass != RegularTimePeriod.class) throw new RuntimeException("Only RegularTimePeriod is supported");

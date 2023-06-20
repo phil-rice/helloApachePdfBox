@@ -3,6 +3,9 @@ package org.hcl.pdftemplate;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.hcl.pdftemplate.part.PdfBufferedImage;
+import org.hcl.pdftemplate.part.PdfImage;
+import org.hcl.pdftemplate.part.PdfText;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -61,7 +64,7 @@ class PdfTextTest {
     @Test
     void testBufferedImage() {
         FunctionWithException<String,BufferedImage> image = Mockito.mock(FunctionWithException.class);
-        PdfBufferedImage <String> pdfImage = new PdfBufferedImage<>(1, 2, 3, image);
+        PdfBufferedImage<String> pdfImage = new PdfBufferedImage<>(1, 2, 3, image);
         assertEquals(1, pdfImage.getX());
         assertEquals(2, pdfImage.getY());
         assertEquals(3, pdfImage.getPageNo());
