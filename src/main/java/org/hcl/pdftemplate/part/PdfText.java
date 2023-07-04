@@ -1,6 +1,5 @@
 package org.hcl.pdftemplate.part;
 
-import jdk.internal.loader.Resource;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,7 @@ public class PdfText<Data> implements IPdfPart<Data> {
     private final int pageNo;
     private final PDType1Font font;
     private final int fontSize;
-    private final FunctionWithException<Data, String> text;
+    private final FunctionWithException<Data,String> text;
 
     @Override
     public void print(IPdfPrinter printer, PDPageContentStream stream, Data data) throws Exception {

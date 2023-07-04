@@ -7,7 +7,7 @@
   <groupId>one.xingyi</groupId>
   <artifactId>pdftemplate</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.4</version>
+  <version>1.4.1</version>
   <url>https://github.com/phil-rice/pdftemplate</url>
   <name>Pdf Template</name>
   <description>Tools for adding text and images to pdfs</description>
@@ -141,7 +141,7 @@
     <dependency>
       <groupId>one.xingyi</groupId>
       <artifactId>optics</artifactId>
-      <version>0.0.6</version>
+      <version>1.0.6</version>
     </dependency>
 
 

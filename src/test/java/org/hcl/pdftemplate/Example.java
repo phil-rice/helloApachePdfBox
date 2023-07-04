@@ -1,8 +1,6 @@
 package org.hcl.pdftemplate;
 
 import lombok.var;
-import one.xingyi.optics.IFold;
-import one.xingyi.tuples.Tuple2;
 import org.hcl.pdftemplate.freeChart.ChartBuilder;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -11,7 +9,6 @@ import org.jfree.data.time.RegularTimePeriod;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hcl.pdftemplate.GraphContents.from;
 import static org.hcl.pdftemplate.freeChart.BufferedImageUtils.removeAlphaChannel;
 
 
@@ -43,12 +41,10 @@ public class Example {
         var s = obj.toString();
         return new Day(Integer.parseInt(s.substring(8, 10)), Integer.parseInt(s.substring(5, 7)), Integer.parseInt(s.substring(0, 4)));
     }
-    static IFold<List<Map<String, Object>>, Tuple2<RegularTimePeriod, Double>> from(String dateKey, String valueKey) {
-        return IFold.of(list -> list.stream().map(map -> Tuple2.of(dateFromString(map.get(dateKey)), (Double) map.get(valueKey))));
-    }
+
 
     public static void main(String[] args) throws Exception {
-        var dataToFreeChart = ChartBuilder.<List<Map<String, Object>>>forDataChart(data -> "Title", data -> "Value").
+        var dataToFreeChart = ChartBuilder.<List<Map<String, Object>>>forDataChart(data -> "Title").
                 subTitle(data -> "SubTitle").
                 addSeries("Series1", Color.RED, from("date", "value")).
                 addSeries("Series2", Color.BLUE, from("date", "value2")).

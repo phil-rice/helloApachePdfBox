@@ -2,6 +2,7 @@ package org.hcl.pdftemplate;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -10,6 +11,7 @@ import org.hcl.pdftemplate.part.*;
 import org.jfree.chart.JFreeChart;
 
 import java.awt.image.BufferedImage;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,9 +20,13 @@ import java.util.ResourceBundle;
 @EqualsAndHashCode
 @Getter
 @ToString
+@RequiredArgsConstructor
 public class PdfBuilder<Data> {
-    static public <Data> PdfBuilder<Data> builder() {
-        return new PdfBuilder<Data>();
+
+    final ResourceBundle bundle;
+    public String getStringFromBundle(String key) {return bundle.getString(key);}
+    static public <Data> PdfBuilder<Data> builder(ResourceBundle bundle) {
+        return new PdfBuilder<Data>(bundle);
     }
 
 
@@ -55,6 +61,15 @@ public class PdfBuilder<Data> {
 
     public PdfBuilder<Data> addText(float x, float y, FunctionWithException<Data, String> text) {
         return with(new PdfText<>(x, y, pageNo, font, fontSize, text));
+    }
+    public PdfBuilder<Data> addI18n(float x, float y, String resourceKey, FunctionWithException<Data, Object[]> params) {
+        return with(new PdfText<>(x, y, pageNo, font, fontSize, data -> {
+            String format = bundle.getString(resourceKey);
+            return MessageFormat.format(format, params.apply(data));
+        }));
+    }
+    public PdfBuilder<Data> addI18n(float x, float y, String resourceKey) {
+        return with(new PdfText<>(x, y, pageNo, font, fontSize, data -> bundle.getString(resourceKey)));
     }
 
     public PdfBuilder<Data> addParts(FunctionWithException<PdfBuilder<Data>, PdfBuilder<Data>> fn) throws Exception {

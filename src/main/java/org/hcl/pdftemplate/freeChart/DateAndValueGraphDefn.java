@@ -1,16 +1,13 @@
 package org.hcl.pdftemplate.freeChart;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import one.xingyi.optics.IFold;
 import one.xingyi.tuples.Tuple2;
 import org.hcl.pdftemplate.FunctionWithException;
+import org.jfree.chart.axis.ValueAxis;
 
 import java.awt.*;
 import java.util.List;
-import java.util.function.Function;
 
 
 @RequiredArgsConstructor
@@ -20,11 +17,12 @@ import java.util.function.Function;
 public class DateAndValueGraphDefn<Data, XData> {
     final FunctionWithException<Data, String> title;
     final FunctionWithException<Data, String> subTitle;
-    final FunctionWithException<Data, String> xAxis;
-    final FunctionWithException<Data, String> yAxis;
+    final FunctionWithException<Data, ValueAxis> xAxis;
+    final FunctionWithException<Data, ValueAxis> yAxis;
     final boolean showXLines;
     final boolean showYLines;
     final List<SeriesDefn<Data, XData>> seriesDefns;
+    final boolean legend;
 }
 
 

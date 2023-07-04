@@ -25,25 +25,19 @@ By maven:
 
 ```java
 
-    List<IPdfPart<List<Map<String, Object>>>> parts = PdfBuilder.<List<Map<String, Object>>>builder()
-            .addImage(100, 450, (doc, data) -> PDImageXObject.createFromFileByContent(
-                    new File(ClassLoader.getSystemResource("picture.jpg").toURI()), doc))
-            .addText(400, 200, data -> "Hello World as text " + data.size())
-            .fontSize(8)
-            .addText(400, 150, data -> "Second text " + data.size())
-            .addJfreeChartAndImage(100, 0,
-                    chartBuilder("Average salary per age", "Salary (€)").
-                            subTitle("some sub title").
-                            addSeries("2016", Color.RED, from("date", "value")).
-                            build(),
-                    200, 100, data -> makeImage())
-            .addJfreeChart(100, 250,
-                    chartBuilder("Second chart", "Salary (€)").
-                            subTitle("some sub title").
-                            addSeries("2016", Color.BLUE, from("date", "value2")).
-                            build())
-            .addBufferedImage(100, 200, data -> makeImage())
-            .build();
+ResourceBundle bundle = ResourceBundle.getBundle("graphconfig");
+        List<IPdfPart<List<Map<String, Object>>>> parts = PdfBuilder.<List<Map<String, Object>>>builder(bundle)
+        .addParts(new GraphDefn<List<Map<String, Object>>>(0, 0, layout,
+        GraphContents.fromListOfMap("one", "value")))
+
+        .addParts(new GraphDefn<List<Map<String, Object>>>(280, 0, layout,
+        GraphContents.fromListOfMap("one", "value2")))
+
+        .addParts(new GraphDefn<List<Map<String, Object>>>(0, 400, layout,
+        GraphContents.fromListOfMap("one", "value")))
+        .addParts(new GraphDefn<List<Map<String, Object>>>(280, 400, layout,
+        GraphContents.fromListOfMap("one", "value2")))
+        .build();
     
     //And then to use it...
     //load the template, apply the data, and save it to a new file        
@@ -64,7 +58,7 @@ By maven:
 
 ```
 This makes four changes to the template. The template is loaded from the class path
-and then saved to a new file: `HelloWorld.pdf`
+and then saved to a new file: `output.pdf`
 
 * The units are in 'whatever the pds's units are'. Normally it will be in points aka 1/72th of an inch.
 * The coordinate (0,0) is the bottom left hand corner of the page
