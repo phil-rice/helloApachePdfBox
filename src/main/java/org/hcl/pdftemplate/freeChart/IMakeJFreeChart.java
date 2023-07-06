@@ -2,6 +2,7 @@ package org.hcl.pdftemplate.freeChart;
 
 import lombok.var;
 import org.hcl.pdftemplate.FunctionWithException;
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartTheme;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
@@ -56,17 +57,7 @@ class MakeJFreeChart implements IMakeJFreeChart {
                                                    ValueAxis xAxis, ValueAxis yAxis, XYDataset dataset,
                                                    boolean legend) {
 
-
         XYPlot plot = new XYPlot(dataset, xAxis, yAxis, null);
-
-        XYToolTipGenerator toolTipGenerator = null;
-
-
-        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(true,
-                false);
-        renderer.setDefaultToolTipGenerator(toolTipGenerator);
-        plot.setRenderer(renderer);
-
         JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, legend);
         currentTheme.apply(chart);
         return chart;
@@ -84,17 +75,11 @@ class MakeJFreeChart implements IMakeJFreeChart {
                     title,
                     defn.xAxis.apply(data),
                     defn.yAxis.apply(data),
-                    dataset, defn.legend);
+                    dataset,
+                    defn.legend);
             XYPlot plot = chart.getXYPlot();
-
-            var renderer = new XYLineAndShapeRenderer();
-            for (int i = 0; i < dataset.getSeriesCount(); i++) {
-                SeriesDefn<Data, RegularTimePeriod> seriesDefn = defn.seriesDefns.get(i);
-                renderer.setSeriesPaint(i, seriesDefn.seriesColor);
-                renderer.setSeriesStroke(i, new BasicStroke(seriesDefn.seriesStrokeWidth));
-            }
-
-            plot.setRenderer(renderer);
+            var renderer = defn.renderer.apply(defn.seriesDefns, dataset);
+            if (renderer != null) plot.setRenderer(renderer);
             plot.setBackgroundPaint(Color.white);
 
             if (defn.showYLines) {

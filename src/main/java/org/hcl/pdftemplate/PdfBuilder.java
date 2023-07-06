@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.hcl.pdftemplate.part.*;
 import org.jfree.chart.JFreeChart;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -24,6 +25,13 @@ import java.util.ResourceBundle;
 public class PdfBuilder<Data> {
 
     final ResourceBundle bundle;
+    String getFromBundle(String key) {
+        return bundle.getString(key);
+    }
+    Color getColorFromBundle(String key) {
+        return Color.decode(bundle.getString(key));
+    }
+
     public String getStringFromBundle(String key) {return bundle.getString(key);}
     static public <Data> PdfBuilder<Data> builder(ResourceBundle bundle) {
         return new PdfBuilder<Data>(bundle);

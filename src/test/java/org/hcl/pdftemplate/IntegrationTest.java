@@ -37,9 +37,6 @@ public class IntegrationTest {
         return ChartBuilder.forDataChart(title);
     }
 
-    GraphDefn<List<Map<String, Object>>> defn1 =
-            new GraphDefn<>(0, 0, GraphLayout.defaultLayout,
-                    fromListOfMap("one", "value"));
 
     public static GraphLayout layout = new GraphLayout(250, 150, 30, 50, 50);
 

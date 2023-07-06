@@ -7,19 +7,19 @@ import lombok.var;
 import one.xingyi.optics.IFold;
 import one.xingyi.tuples.Tuple2;
 import one.xingyi.utils.StreamHelper;
-import org.hcl.pdftemplate.freeChart.ChartBuilder;
-import org.hcl.pdftemplate.freeChart.IMakeJFreeChart;
+import org.hcl.pdftemplate.freeChart.*;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.RegularTimePeriod;
+import org.jfree.data.xy.XYDataset;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.hcl.pdftemplate.Example.dateFromString;
 import static org.hcl.pdftemplate.IntegrationTest.makeRectangle;
-import static org.hcl.pdftemplate.utils.BundleUtils.toParams;
 import static org.hcl.pdftemplate.utils.BundleUtils.toStringFn;
 
 @RequiredArgsConstructor
@@ -46,7 +46,8 @@ class GraphContents<Data> {
                 bundlePrefix + ".text1",
                 bundlePrefix + ".text2",
                 bundlePrefix + ".xAxis",
-                bundlePrefix + ".yAxis");
+                bundlePrefix + ".yAxis",
+                bundlePrefix + ".color");
 
 
     }
@@ -57,6 +58,7 @@ class GraphContents<Data> {
     final String textKey2;
     final String graphXAxisKey;
     final String graphYaxisKey;
+    final String seriesColorKey;
 
     public GraphDefn<Data> displayAt(int x, int y, GraphLayout layout) {
         return new GraphDefn<>(x, y, layout, this);
@@ -88,7 +90,6 @@ public class GraphDefn<Data> implements IPdfBuilderParts<Data> {
                 .addBufferedImage(x + title0Width + layout.title1Width, titley,
                         data -> makeRectangle(layout.title2Width, layout.titleHeight, Color.YELLOW))
                 .addI18n(x + 5, titley + 20, contents.titleKey)
-
                 .addI18n(x + title0Width + 5, titley + 20, contents.textKey1)
                 .addText(x + title0Width + 5, titley + 10, toStringFn("%5.2f", avgOfLast12))
                 .addI18n(x + title0Width + layout.title1Width + 5, titley + 20, contents.textKey2)
@@ -96,7 +97,9 @@ public class GraphDefn<Data> implements IPdfBuilderParts<Data> {
                 .addJfreeChart(x, y, layout.graphWidth, layout.graphHeight,
                         ChartBuilder.<Data>forDataChart(data -> null)
                                 .yAxis(IMakeJFreeChart.valueAxis(ignore -> builder.bundle.getString(contents.graphYaxisKey)))
-                                .addSeries(builder.bundle.getString(contents.graphXAxisKey), Color.blue, contents.fold).
+                                .addSeries(builder.getFromBundle(contents.graphXAxisKey),
+                                        builder.getColorFromBundle(contents.seriesColorKey),
+                                        contents.fold).
                                 build());
     }
 }

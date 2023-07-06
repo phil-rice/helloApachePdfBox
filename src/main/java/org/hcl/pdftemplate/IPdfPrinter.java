@@ -14,9 +14,7 @@ import org.hcl.pdftemplate.part.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import static org.hcl.pdftemplate.freeChart.BufferedImageUtils.removeAlphaChannel;
 

@@ -5,9 +5,13 @@ import one.xingyi.optics.IFold;
 import one.xingyi.tuples.Tuple2;
 import org.hcl.pdftemplate.FunctionWithException;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYDataset;
 
 import java.awt.*;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 
 @RequiredArgsConstructor
@@ -19,6 +23,7 @@ public class DateAndValueGraphDefn<Data, XData> {
     final FunctionWithException<Data, String> subTitle;
     final FunctionWithException<Data, ValueAxis> xAxis;
     final FunctionWithException<Data, ValueAxis> yAxis;
+    final BiFunction<List<SeriesDefn<Data, XData>>, XYDataset, XYLineAndShapeRenderer> renderer;
     final boolean showXLines;
     final boolean showYLines;
     final List<SeriesDefn<Data, XData>> seriesDefns;
@@ -26,13 +31,3 @@ public class DateAndValueGraphDefn<Data, XData> {
 }
 
 
-@RequiredArgsConstructor
-@EqualsAndHashCode
-@Getter
-@ToString
-class SeriesDefn<Data, XData> {
-    final String seriesName;
-    final Color seriesColor;
-    final IFold<Data, Tuple2<XData, Double>> dataFn;
-    final Float seriesStrokeWidth;
-}
