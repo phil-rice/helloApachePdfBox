@@ -17,7 +17,7 @@ By maven:
 <dependency>
   <groupId>one.xingyi.pdftemplate</groupId>
   <artifactId>pdftemplate</artifactId>
-  <version>1.2.0</version>
+  <version>1.4.4</version>
 </dependency>
 ```
 
