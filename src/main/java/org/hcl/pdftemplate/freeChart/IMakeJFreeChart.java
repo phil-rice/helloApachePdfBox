@@ -2,7 +2,6 @@ package org.hcl.pdftemplate.freeChart;
 
 import lombok.var;
 import org.hcl.pdftemplate.FunctionWithException;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartTheme;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
@@ -10,12 +9,8 @@ import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.BlockBorder;
-import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
-import org.jfree.chart.urls.StandardXYURLGenerator;
-import org.jfree.chart.urls.XYURLGenerator;
 import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -81,6 +76,7 @@ class MakeJFreeChart implements IMakeJFreeChart {
             var renderer = defn.renderer.apply(defn.seriesDefns, dataset);
             if (renderer != null) plot.setRenderer(renderer);
             plot.setBackgroundPaint(Color.white);
+            defn.modifyPlot.accept(plot);
 
             if (defn.showYLines) {
                 plot.setRangeGridlinesVisible(true);

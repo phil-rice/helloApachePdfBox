@@ -46,7 +46,7 @@ public interface IPdfPrinter {
                     part.print(printer, stream, data));
     }
     static void withStream(PDDocument doc, int pageNo, ConsumerWithException<PDPageContentStream> consumer) throws Exception {
-        PDPage page = getPdPage(doc, pageNo);
+        PDPage page = getPdPage(doc,pageNo);
         try (PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, false, true)) {
             consumer.accept(contentStream);
         }
@@ -59,10 +59,14 @@ public interface IPdfPrinter {
         }
     }
     <Data> void printText(PDPageContentStream stream, Data data, PdfText<Data> text) throws Exception;
+
     <Data> void printImage(PDPageContentStream stream, Data data, PdfImage<Data> image) throws Exception;
+
     <Data> void printBufferedImage(PDPageContentStream stream, Data data, PdfBufferedImage<Data> image) throws Exception;
+
     <Data> void printJFreeChart(PDPageContentStream stream, Data data, PdfJFreeChart<Data> pdfJFreeChart) throws Exception;
 }
+
 @RequiredArgsConstructor
 @EqualsAndHashCode
 @Getter

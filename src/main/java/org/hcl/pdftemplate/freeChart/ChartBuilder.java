@@ -8,6 +8,8 @@ import one.xingyi.tuples.Tuple2;
 import org.hcl.pdftemplate.FunctionWithException;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.AbstractXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.xy.XYDataset;
@@ -16,6 +18,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -27,7 +30,7 @@ public class ChartBuilder<Data, XData> {
     FunctionWithException<Data, String> subTitle = data -> "";
     FunctionWithException<Data, ValueAxis> xAxis = IMakeJFreeChart.timeAxis(data -> "Date");
     FunctionWithException<Data, ValueAxis> yAxis = IMakeJFreeChart.valueAxis(data -> "Value");
-    BiFunction<List<SeriesDefn<Data, XData>>, XYDataset, XYLineAndShapeRenderer> renderer = (seriesDefns, dataset) -> {
+    BiFunction<List<SeriesDefn<Data, XData>>, XYDataset, AbstractXYItemRenderer> renderer = (seriesDefns, dataset) -> {
         var renderer = new XYLineAndShapeRenderer(true, false);
         for (int i = 0; i < dataset.getSeriesCount(); i++) {
             SeriesDefn<Data, XData> seriesDefn = seriesDefns.get(i);
@@ -39,6 +42,7 @@ public class ChartBuilder<Data, XData> {
     boolean showXLines = false;
     boolean showYLines = false;
     boolean showLegend = false;
+    Consumer<XYPlot> modifyPlot = plot -> {};
 
     //For the series
     Float seriesStrokeWidth = 2.0f;
@@ -53,9 +57,10 @@ public class ChartBuilder<Data, XData> {
     public ChartBuilder<Data, XData> subTitle(FunctionWithException<Data, String> subTitle) {this.subTitle = subTitle; return this;}
     public ChartBuilder<Data, XData> xAxis(FunctionWithException<Data, ValueAxis> xAxis) {this.xAxis = xAxis; return this;}
     public ChartBuilder<Data, XData> yAxis(FunctionWithException<Data, ValueAxis> yAxis) {this.yAxis = yAxis; return this;}
-    public ChartBuilder<Data, XData> renderer(BiFunction<List<SeriesDefn<Data, XData>>, XYDataset, XYLineAndShapeRenderer> renderer) {this.renderer = renderer; return this;}
+    public ChartBuilder<Data, XData> renderer(BiFunction<List<SeriesDefn<Data, XData>>, XYDataset, AbstractXYItemRenderer> renderer) {this.renderer = renderer; return this;}
     public ChartBuilder<Data, XData> showXLines(boolean showXLines) {this.showXLines = showXLines; return this;}
     public ChartBuilder<Data, XData> showYLines(boolean showYLines) {this.showYLines = showYLines; return this;}
+    public ChartBuilder<Data, XData> modifyPlot(Consumer<XYPlot> modifyPlot) {this.modifyPlot = modifyPlot; return this;}
     public ChartBuilder<Data, XData> showLegend(boolean showLegend) {this.showLegend = showLegend; return this;}
     public ChartBuilder<Data, XData> seriesStrokeWidth(Float seriesStrokeWidth) {this.seriesStrokeWidth = seriesStrokeWidth; return this;}
     public ChartBuilder<Data, XData> addSeries(String seriesName, Color
@@ -68,7 +73,7 @@ public class ChartBuilder<Data, XData> {
     }
 
     public FunctionWithException<Data, DateAndValueGraphDefn<Data, XData>> buildDefn() {
-        return data -> new DateAndValueGraphDefn<Data, XData>(title, subTitle, xAxis, yAxis, renderer, showXLines, showYLines, seriesDefns, showLegend);
+        return data -> new DateAndValueGraphDefn<Data, XData>(title, subTitle, xAxis, yAxis, renderer, modifyPlot, showXLines, showYLines, seriesDefns, showLegend);
     }
     public FunctionWithException<Data, JFreeChart> build(IMakeJFreeChart makeJFreeChart) {
         if (xDataClass != RegularTimePeriod.class)

@@ -1,17 +1,18 @@
 package org.hcl.pdftemplate.freeChart;
 
-import lombok.*;
-import one.xingyi.optics.IFold;
-import one.xingyi.tuples.Tuple2;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.hcl.pdftemplate.FunctionWithException;
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.AbstractXYItemRenderer;
 import org.jfree.data.xy.XYDataset;
 
-import java.awt.*;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 
 @RequiredArgsConstructor
@@ -23,7 +24,8 @@ public class DateAndValueGraphDefn<Data, XData> {
     final FunctionWithException<Data, String> subTitle;
     final FunctionWithException<Data, ValueAxis> xAxis;
     final FunctionWithException<Data, ValueAxis> yAxis;
-    final BiFunction<List<SeriesDefn<Data, XData>>, XYDataset, XYLineAndShapeRenderer> renderer;
+    final BiFunction<List<SeriesDefn<Data, XData>>, XYDataset, AbstractXYItemRenderer> renderer;
+    final Consumer<XYPlot> modifyPlot;
     final boolean showXLines;
     final boolean showYLines;
     final List<SeriesDefn<Data, XData>> seriesDefns;

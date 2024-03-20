@@ -8,7 +8,10 @@ import one.xingyi.optics.IFold;
 import one.xingyi.tuples.Tuple2;
 import one.xingyi.utils.StreamHelper;
 import org.hcl.pdftemplate.freeChart.*;
+import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.ui.Layer;
 import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.xy.XYDataset;
 
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hcl.pdftemplate.Example.dateFromString;
 import static org.hcl.pdftemplate.IntegrationTest.makeRectangle;
@@ -78,6 +82,8 @@ public class GraphDefn<Data> implements IPdfBuilderParts<Data> {
         var titley = y + layout.graphHeight;
         var title0Width = layout.graphWidth - (layout.title1Width + layout.title2Width);
         FunctionWithException<Data, Double> last = data -> StreamHelper.last(contents.fold.all(data)).t2;
+        FunctionWithException<Data, Double> max = data -> contents.fold.all(data).map(t -> t.t2).reduce(100.0, Math::max);
+
         FunctionWithException<Data, Double> avgOfLast12 = data -> {
             List<Tuple2<RegularTimePeriod, Double>> lastFew = StreamHelper.lastN(contents.fold.all(data), 12).collect(Collectors.toList());
             return lastFew.stream().collect(Collectors.averagingDouble(d -> d.t2));
@@ -97,6 +103,9 @@ public class GraphDefn<Data> implements IPdfBuilderParts<Data> {
                 .addJfreeChart(x, y, layout.graphWidth, layout.graphHeight,
                         ChartBuilder.<Data>forDataChart(data -> null)
                                 .yAxis(IMakeJFreeChart.valueAxis(ignore -> builder.bundle.getString(contents.graphYaxisKey)))
+                                .modifyPlot(plot -> {
+                                    plot.addRangeMarker(new IntervalMarker(700.0, 1000.0, new Color(1, 0, 0, 1 / 2f)), Layer.BACKGROUND);
+                                })
                                 .addSeries(builder.getFromBundle(contents.graphXAxisKey),
                                         builder.getColorFromBundle(contents.seriesColorKey),
                                         contents.fold).
